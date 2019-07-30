@@ -240,7 +240,7 @@ function entityhelper_get_field_values_by_id($entity_type, $entity_id, $fields, 
  *   otherwise.
  */
 function entityhelper_have_fields_changed($entity, $field_names) {
-  return entityhelper_container()->EntityHelperGet
+  return entityhelper_container()->EntityHelperChanged
       ->haveFieldsChanged($entity, $field_names);
 }
 
@@ -257,6 +257,6 @@ function entityhelper_have_fields_changed($entity, $field_names) {
  *   field has changed, FALSE otherwise.
  */
 function entityhelper_have_fields_changed_detailed($entity, $field_names) {
-  return entityhelper_container()->EntityHelperGet
+  return entityhelper_container()->EntityHelperChanged
       ->haveFieldsChangedDetailed($entity, $field_names);
 }

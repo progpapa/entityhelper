@@ -10,6 +10,7 @@ dependencies[] = entity_base_type
 files[] = inc/container/EntityHelperContainer.inc
 files[] = inc/EntityHelperConfig.inc
 files[] = inc/EntityHelperField.inc
+files[] = inc/EntityHelperChanged.inc
 files[] = inc/EntityHelperGet.inc
 files[] = inc/EntityHelperSet.inc
 files[] = inc/EntityHelperWrapper.inc
