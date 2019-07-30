@@ -211,6 +211,15 @@ function entityhelper_get_field_values($entity, $fields, EntityHelperConfig $con
 }
 
 /**
+ * Get fields values if the entity type and id is known.
+ * @see entityhelper_get_field_values()
+ */
+function entityhelper_get_field_values_by_id($entity_type, $entity_id, $fields, EntityHelperConfig $config = NULL) {
+  $entity = entity_load_single($entity_type, $entity_id);
+  return entityhelper_container()->EntityHelperGet->get($entity, $fields, $config);
+}
+
+/**
  * Checks if certain fields of an entity has changed during an update.
  *
  * @param object $entity
