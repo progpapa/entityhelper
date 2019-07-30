@@ -1,0 +1,245 @@
+<?php
+
+/**
+ * @file
+ * Main file for the entityhelper module.
+ */
+
+
+/**
+ * @return EntityHelperContainer
+ */
+function entityhelper_container() {
+  return container('EntityHelperContainer');
+}
+
+/**
+ * Implements hook_menu().
+ */
+function entityhelper_menu() {
+  $items = array();
+  // Updates a field of an entity.
+  // arguments:
+  //   - $entity_type
+  //   - $entity_id
+  //   - $field_name
+  //   - $value
+  $items['entityhelper/update/%/%/%/%'] = array(
+    'title' => 'Update Entity',
+    'page callback' => 'entityhelper_update_single_field_by_id',
+    'page arguments' => array(2, 3, 4, 5),
+    'access callback' => 'entityhelper_user_can_edit_field',
+    'access arguments' => array(2, 3, 4),
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+/**
+ * Checks if a user can edit a field of an entity.
+ *
+ * @param string $entity_type
+ * @param int $entity_id
+ * @param string $field_name
+ * @param object $account
+ *
+ * @return boolean
+ */
+function entityhelper_user_can_edit_field($entity_type, $entity_id, $field_name, $account = NULL) {
+  $entity = entity_object_load($entity_id, $entity_type);
+  if (!entity_access('update', $entity_type, $entity, $account)) {
+    return FALSE;
+  }
+  $field_info = field_info_field($field_name);
+  if (!field_access('edit', $field_info, $entity_type, $entity, $account)) {
+    return FALSE;
+  }
+  return TRUE;
+}
+
+/**
+ * Simple wrapper around entity_create(). Makes sure the base_type property is
+ * set. The entity_base_type module cannot set it on entity creation.
+ *
+ * @param string $entity_type
+ * @param array $values
+ *
+ * @return object
+ *
+ * @see entity_create()
+ */
+function entityhelper_create($entity_type, array $values) {
+  $entity = entity_create($entity_type, $values);
+  if ($entity) {
+    $entity->base_type = $entity_type;
+  }
+  return $entity;
+}
+
+/**
+ * Gets the metadata wrapper for an entity.
+ *
+ * @param object $entity
+ *
+ * @return EntityMetadataWrapper
+ */
+function entityhelper_get_wrapper($entity) {
+  return entityhelper_container()->EntityHelperWrapper->get($entity);
+}
+
+/**
+ * Gets the metadata wrapper for an entity when only the entity id is known.
+ *
+ * @param string $entity_type
+ * @param int $entity_id
+ *
+ * @return EntityMetadataWrapper
+ */
+function entityhelper_get_wrapper_by_id($entity_type, $entity_id) {
+  return entityhelper_container()->EntityHelperWrapper
+      ->get_by_id($entity_type, $entity_id);
+}
+
+/**
+ * Updates a single field of an entity.
+ *
+ * @param string $entity_type
+ *   Machine name of the entity type.
+ * @param integer $entity_id
+ * @param string $field_name
+ *   The machine name of the field
+ * @param mixed $value
+ *   The new value of the field.
+ * @param bool $skip_save
+ *   Flag to indicate if the entity shouldn't be saved.
+ * @param array $config
+ *   Configuration array. @see EntityHelperSet::setFields()
+ */
+function entityhelper_update_single_field_by_id($entity_type, $entity_id, $field_name, $value, $skip_save = FALSE, $config = array()) {
+  entityhelper_update_field_by_id(
+      $entity_type, $entity_id, array($field_name => $value), $skip_save, $config);
+}
+
+/**
+ * Updates a single field of an entity.
+ *
+ * @param object $entity
+ * @param string $field_name
+ *   The machine name of the field
+ * @param mixed $value
+ *   The new value of the field.
+ * @param bool $skip_save
+ *   Flag to indicate if the entity shouldn't be saved.
+ * @param array $config
+ *   Configuration array. @see EntityHelperSet::setFields()
+ */
+function entityhelper_update_single_field($entity, $field_name, $value, $skip_save = FALSE, $config = array()) {
+  entityhelper_update_field($entity, array($field_name => $value), $skip_save, $config);
+}
+
+/**
+ * Updates entity fields.
+ *
+ * @param string $entity_type
+ *   Machine name of the entity type.
+ * @param integer $entity_id
+ * @param array $values
+ *   An associative array keyed by field machine names, values are field values
+ *   that should be set.
+ * @param bool $skip_save
+ *   Flag to indicate if the entity shouldn't be saved.
+ * @param array $config
+ *   Configuration array. @see EntityHelperSet::setFieldsByID()
+ */
+function entityhelper_update_field_by_id($entity_type, $entity_id, $values, $skip_save = FALSE, $config = array()) {
+  entityhelper_container()->EntityHelperSet
+      ->setFieldsByID($entity_type, $entity_id, $values, $skip_save, $config);
+}
+
+/**
+ * Updates entity fields.
+ *
+ * @param object $entity
+ *   The entity to update.
+ * @param array $values
+ *   An associative array keyed by field machine names, values are field values
+ *   that should be set.
+ * @param bool $skip_save
+ *   Flag to indicate if the entity shouldn't be saved.
+ * @param array $config
+ *   Configuration array. @see EntityHelperSet::setFields()
+ */
+function entityhelper_update_field($entity, $values, $skip_save = FALSE, $config = array()) {
+  entityhelper_container()->EntityHelperSet
+      ->setFields($entity, $values, $skip_save, $config);
+}
+
+/**
+ * Wrapper function to get entity id or fail silently.
+ *
+ * @param object $entity
+ *
+ * @return integer|NULL
+ */
+function entityhelper_get_id($entity) {
+  // In order to have the base_type property, the entity_base_type module needs
+  // to be enabled.
+  if (empty($entity->base_type)) {
+    return NULL;
+  }
+  return entity_id($entity->base_type, $entity);
+}
+
+  /**
+   * Gets one or more field values of an entity.
+   *
+   * @param Entity $entity
+   * @param string|array $fields
+   *   Machine name of a single field or an array of fields.
+   * @param EntityHelperConfig $config
+   *   @see EntityHelperConfig
+   *
+   * @return mixed
+   *   For a single field the value is returned, for multiple fields an associative
+   *   array is returned. Keys are the field machine names, values are the field
+   *   values.
+   *   If a field value is not set, NULL is returned for that field or an empty
+   *   array for multivalue fields.
+   */
+function entityhelper_get_field_values($entity, $fields, EntityHelperConfig $config = NULL) {
+  return entityhelper_container()->EntityHelperGet->get($entity, $fields, $config);
+}
+
+/**
+ * Checks if certain fields of an entity has changed during an update.
+ *
+ * @param object $entity
+ *   The entity to check.
+ * @param array $field_names
+ *   An array of field machine names.
+ *
+ * @return boolean
+ *   Returns TRUE if any of the fields in $field_names has changed, FALSE
+ *   otherwise.
+ */
+function entityhelper_have_fields_changed($entity, $field_names) {
+  return entityhelper_container()->EntityHelperGet
+      ->haveFieldsChanged($entity, $field_names);
+}
+
+/**
+ * Checks if certain fields of an entity has changed during an update.
+ *
+ * @param object $entity
+ *   The entity to check.
+ * @param array $field_names
+ *   An array of field machine names.
+ *
+ * @return array
+ *   Each element is keyed by the field machine name and value is TRUE if that
+ *   field has changed, FALSE otherwise.
+ */
+function entityhelper_have_fields_changed_detailed($entity, $field_names) {
+  return entityhelper_container()->EntityHelperGet
+      ->haveFieldsChangedDetailed($entity, $field_names);
+}
