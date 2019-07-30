@@ -80,11 +80,14 @@ function entityhelper_create($entity_type, array $values) {
  * Gets the metadata wrapper for an entity.
  *
  * @param object $entity
+ * @param bool $skip_cache
+ *   If TRUE, static cache is skipped. Might have some issues, e.g.:
+ *   https://www.drupal.org/project/entity/issues/2927615
  *
  * @return EntityMetadataWrapper
  */
-function entityhelper_get_wrapper($entity) {
-  return entityhelper_container()->EntityHelperWrapper->get($entity);
+function entityhelper_get_wrapper($entity, $skip_cache = FALSE) {
+  return entityhelper_container()->EntityHelperWrapper->get($entity, $skip_cache);
 }
 
 /**
@@ -92,12 +95,15 @@ function entityhelper_get_wrapper($entity) {
  *
  * @param string $entity_type
  * @param int $entity_id
+ * @param bool $skip_cache
+ *   If TRUE, static cache is skipped. Might have some issues, e.g.:
+ *   https://www.drupal.org/project/entity/issues/2927615
  *
  * @return EntityMetadataWrapper
  */
-function entityhelper_get_wrapper_by_id($entity_type, $entity_id) {
+function entityhelper_get_wrapper_by_id($entity_type, $entity_id, $skip_cache = FALSE) {
   return entityhelper_container()->EntityHelperWrapper
-      ->get_by_id($entity_type, $entity_id);
+      ->get_by_id($entity_type, $entity_id, $skip_cache);
 }
 
 /**
@@ -206,17 +212,19 @@ function entityhelper_get_id($entity) {
    *   If a field value is not set, NULL is returned for that field or an empty
    *   array for multivalue fields.
    */
-function entityhelper_get_field_values($entity, $fields, EntityHelperConfig $config = NULL) {
-  return entityhelper_container()->EntityHelperGet->get($entity, $fields, $config);
+function entityhelper_get_field_values($entity, $fields, EntityHelperConfig $config = NULL, $skip_cache = FALSE) {
+  return entityhelper_container()->EntityHelperGet
+      ->get($entity, $fields, $config, $skip_cache);
 }
 
 /**
  * Get fields values if the entity type and id is known.
  * @see entityhelper_get_field_values()
  */
-function entityhelper_get_field_values_by_id($entity_type, $entity_id, $fields, EntityHelperConfig $config = NULL) {
+function entityhelper_get_field_values_by_id($entity_type, $entity_id, $fields, EntityHelperConfig $config = NULL, $skip_cache = FALSE) {
   $entity = entity_load_single($entity_type, $entity_id);
-  return entityhelper_container()->EntityHelperGet->get($entity, $fields, $config);
+  return entityhelper_container()->EntityHelperGet
+      ->get($entity, $fields, $config, $skip_cache);
 }
 
 /**

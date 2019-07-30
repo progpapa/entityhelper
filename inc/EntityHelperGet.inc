@@ -78,7 +78,7 @@ class EntityHelperGet {
    *
    * @see entityhelper_get_field_values()
    */
-  public function get($entity, $fields, EntityHelperConfig $config = NULL) {
+  public function get($entity, $fields, EntityHelperConfig $config = NULL, $skip_cache = FALSE) {
     // If wrong data is provided, e.g. empty $entity, return NULL for all fields.
     if (empty($entity) OR ! is_object($entity)) {
       if (is_array($fields)) {
@@ -87,7 +87,7 @@ class EntityHelperGet {
       return NULL;
     }
 
-    $wrapper = entityhelper_get_wrapper($entity);
+    $wrapper = entityhelper_get_wrapper($entity, $skip_cache);
     // Single field name passed:
     if (is_string($fields)) {
       return $this->getFieldValue($wrapper, $fields, $config);

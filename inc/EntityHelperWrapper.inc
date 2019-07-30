@@ -23,17 +23,23 @@ class EntityHelperWrapper {
    * @param object $entity
    *   Optional, might not be loaded when calling this method. If not passed,
    *   the function will load the entity.
+   * @param bool $skip_cache
+   *   If TRUE, static cache is skipped. Might have some issues, e.g.:
+   *   https://www.drupal.org/project/entity/issues/2927615
    *
    * @return EntityMetadataWrapper
    *
    * @todo: handle empty ids, i.e. entity creation
    */
-  public function get_by_id($entity_type, $entity_id, $entity = NULL) {
-    if (isset($this->wrappers[$entity_type][$entity_id])) {
+  public function get_by_id($entity_type, $entity_id, $entity = NULL, $skip_cache = FALSE) {
+    if (isset($this->wrappers[$entity_type][$entity_id]) && !$skip_cache) {
       return $this->wrappers[$entity_type][$entity_id];
     }
     if (is_null($entity)) {
       $entity = entity_load_single($entity_type, $entity_id);
+    }
+    if ($skip_cache) {
+      return entity_metadata_wrapper($entity_type, $entity);
     }
     // Check if wrapper is already stored temporarily. In this case the entity
     // has been created recently and hasn't been wrapped yet after saving.
@@ -55,12 +61,15 @@ class EntityHelperWrapper {
    * Gets the metadatawrapper of an entity.
    *
    * @param object $entity
+   * @param bool $skip_cache
+   *   If TRUE, static cache is skipped. Might have some issues, e.g.:
+   *   https://www.drupal.org/project/entity/issues/2927615
    *
    * @return EntityMetadataWrapper
    *
    * @throws Exception
    */
-  public function get($entity) {
+  public function get($entity, $skip_cache) {
     // Base type should be set by the entity_base_type module. However it cannot
     // set this property for newly created entities. In this case it should
     // either be set manually from code or the entityhelper_create() function
@@ -73,7 +82,7 @@ class EntityHelperWrapper {
     $entity_type = $entity->base_type;
     $entity_id = entity_id($entity_type, $entity);
     if (!empty($entity_id)) {
-      return $this->get_by_id($entity_type, $entity_id, $entity);
+      return $this->get_by_id($entity_type, $entity_id, $entity, $skip_cache);
     }
     // This is a newly created entity, it has no id yet, let's create a
     // temporary id and store the wrapper using that.
