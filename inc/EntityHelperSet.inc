@@ -16,8 +16,10 @@ class EntityHelperSet {
    *   values that should be set.
    * @param bool $skip_save
    *   Flag to indicate if the entity shouldn't be saved.
+   * @param EntityHelperConfig $config
+   *   @see EntityHelperConfig
    */
-  public function setFieldsByID($entity_type, $entity_id, $values, $skip_save = FALSE, $config = array()) {
+  public function setFieldsByID($entity_type, $entity_id, $values, $skip_save = FALSE, EntityHelperConfig $config = NULL) {
     $entity = entity_load_single($entity_type, $entity_id);
     $this->setFields($entity, $values, $skip_save, $config);
   }
