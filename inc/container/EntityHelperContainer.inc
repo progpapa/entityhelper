@@ -7,5 +7,6 @@
  * @property EntityHelperGet $EntityHelperGet
  * @property EntityHelperSet $EntityHelperSet
  * @property EntityHelperWrapper $EntityHelperWrapper
+ * @property EntityHelperTaxonomy $EntityHelperTaxonomy
  */
 class EntityHelperContainer extends AbstractContainer {}

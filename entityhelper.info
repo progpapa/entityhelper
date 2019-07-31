@@ -14,3 +14,4 @@ files[] = inc/EntityHelperChanged.inc
 files[] = inc/EntityHelperGet.inc
 files[] = inc/EntityHelperSet.inc
 files[] = inc/EntityHelperWrapper.inc
+files[] = inc/EntityHelperTaxonomy.inc
