@@ -63,11 +63,11 @@ class EntityHelperConfig {
    *
    * @param string $format
    *   A valid PHP date format.
-   * @param string|array $fields
-   *   A field name or array of field names to apply this format. If empty, the
-   *   format will be applied to all fields with 'type' => 'date'.
+   * @param array $fields
+   *   An array of field names to apply this format to. If empty, the format
+   *   will be applied to all fields with 'type' => 'date'.
    */
-  public function addDateFormat($format, $fields = NULL) {
+  public function addDateFormat($format, $fields = array()) {
     foreach ($this->fields as $field_name => &$config) {
       if ($config['type'] !== 'date') {
         continue;
