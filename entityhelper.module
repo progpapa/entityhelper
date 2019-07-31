@@ -172,10 +172,10 @@ function entityhelper_update_field_by_id($entity_type, $entity_id, $values, $ski
  *   that should be set.
  * @param bool $skip_save
  *   Flag to indicate if the entity shouldn't be saved.
- * @param array $config
- *   Configuration array. @see EntityHelperSet::setFields()
+ * @param EntityHelperConfig $config
+ *   @see EntityHelperConfig
  */
-function entityhelper_update_field($entity, $values, $skip_save = FALSE, $config = array()) {
+function entityhelper_update_field($entity, $values, $skip_save = FALSE, EntityHelperConfig $config = NULL) {
   entityhelper_container()->EntityHelperSet
       ->setFields($entity, $values, $skip_save, $config);
 }

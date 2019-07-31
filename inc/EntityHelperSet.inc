@@ -31,14 +31,11 @@ class EntityHelperSet {
    *   values that should be set.
    * @param bool $skip_save
    *   Flag to indicate if the entity shouldn't be saved.
+   * @param EntityHelperConfig $config
+   *   @see EntityHelperConfig
    */
-  public function setFields($entity, $values, $skip_save = FALSE, $config = array()) {
+  public function setFields($entity, $values, $skip_save = FALSE, EntityHelperConfig $config = NULL) {
     $wrapper = entityhelper_get_wrapper($entity);
-    // If there are custom settings on how the data should be saved, we need
-    // to store the fields info for later use.
-    if (!empty($config)) {
-      $config['info'] = $wrapper->getPropertyInfo();
-    }
     foreach ($values as $field_name => $value) {
       if (!empty($config)) {
         $value = $this->applyConfigToValue($wrapper, $field_name, $value, $config);
@@ -50,35 +47,16 @@ class EntityHelperSet {
     }
   }
 
-  protected function applyConfigToValue($wrapper, $field_name, $value, $config) {
-    // Sanity check, we need some info about all the fields in $config['info']
-    // and we don't touch fields with no value.
-    if (empty($config['info']) OR is_null($value)) {
+  protected function applyConfigToValue(EntityMetadataWrapper $wrapper, $field_name, $value, EntityHelperConfig $config = NULL) {
+    $conf = $config->getConfigForField($field_name);
+    if (empty($conf) OR is_null($value)) {
       return $value;
     }
 
-    $map = field_info_field_map();
-    // This is a regular field.
-    if (!empty($map[$field_name]['type'])) {
-      $field_type = $map[$field_name]['type'];
-    }
-    // This is a proerty with known type.
-    elseif (!empty($config['info'][$field_name]['type'])) {
-      $field_type = $config['info'][$field_name]['type'];
-    }
-    // This is a property with undefined type. (e.g. node title)
-    else {
-      $field_type = 'unknown';
-    }
-    switch ($field_type) {
-//      case 'list_text':
-//      case 'list_boolean':
-//        return $this->getListValuesByKeys($wrapper, $field_name, $config, $value);
-      case 'taxonomy_term_reference':
-        return $this->setTaxonomyTerms($wrapper, $field_name, $value, $config);
-//      case 'datetime':
-//      case 'date':
-//        return $this->getDate($wrapper, $field_name, $config, $value);
+    switch ($conf['type']) {
+      case 'term_name':
+        $value = $this->setTaxonomyTermByName($wrapper, $field_name, $value);
+        break;
       default:
         break;
     }
@@ -86,27 +64,20 @@ class EntityHelperSet {
   }
 
   /**
-   * For taxonomy terms the default is to return the term object. This function
-   * finds out if names, term ids or links should be returned.
+   * For taxonomy terms the default is to set by term id. This function takes
+   * term names and returns the appropriate term ids.
    */
-  protected function setTaxonomyTerms(EntityMetadataWrapper $wrapper, $field_name, $value, $config) {
-    // Do nothing is the calling function didn't explicitly asked us.
-    if (empty($config['term'])) {
-      return $value;
+  protected function setTaxonomyTermByName(EntityMetadataWrapper $wrapper, $field_name, $value) {
+    $field_info = field_info_field($field_name);
+    // This should never happen for term reference fields.
+    if (empty($field_info['settings']['allowed_values'][0]['vocabulary'])) {
+      $message = t('Looks like @field is not a term reference field.'
+          , array('@field' => $field_name));
+      throw new Exception($message);
     }
-
-    $ret = array();
-    switch ($config['term']) {
-      case 'names':
-        $field_info = field_info_field($field_name);
-        $vocabulary = $field_info['settings']['allowed_values'][0]['vocabulary'];
-        $term_arr = taxonomy_get_term_by_name($value, $vocabulary);
-        return empty($term_arr) ? NULL : key($term_arr);
-      default:
-        $ret = $value;
-        break;
-    }
-    return $ret;
+    $vocab_name = $field_info['settings']['allowed_values'][0]['vocabulary'];
+    return entityhelper_container()->EntityHelperTaxonomy
+        ->getTermIDsByNameAndVocabName($value, $vocab_name);
   }
 
   /**
