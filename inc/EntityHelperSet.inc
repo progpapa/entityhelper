@@ -52,10 +52,12 @@ class EntityHelperSet {
     if (empty($conf) OR is_null($value)) {
       return $value;
     }
-
     switch ($conf['type']) {
       case 'term_name':
         $value = $this->setTaxonomyTermByName($field_name, $value);
+        break;
+      case 'list_value':
+        $value = $this->setListByValue($wrapper, $field_name, $value);
         break;
       default:
         break;
@@ -78,6 +80,24 @@ class EntityHelperSet {
     $vocab_name = $field_info['settings']['allowed_values'][0]['vocabulary'];
     return entityhelper_container()->EntityHelperTaxonomy
         ->getTermIDsByNameAndVocabName($value, $vocab_name);
+  }
+
+  /**
+   * For list field the default is to set by key. This function takes list
+   * values and returns the appropriate keys.
+   *
+   * @todo: Move this into a list related service class?
+   */
+  protected function setListByValue(EntityMetadataWrapper $wrapper, $field_name, $value) {
+      $allowed = $wrapper->{$field_name}->optionsList();
+      $single = FALSE;
+      if (is_string($value)) {
+        $value = (array)$value;
+        $single = TRUE;
+      }
+      $values = array_keys(array_intersect($allowed, array_combine($value, $value)));
+      $ret = $single ? reset($values) : $values;
+      return empty($ret) ? NULL : $ret;
   }
 
   /**
