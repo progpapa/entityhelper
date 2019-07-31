@@ -55,7 +55,7 @@ class EntityHelperSet {
 
     switch ($conf['type']) {
       case 'term_name':
-        $value = $this->setTaxonomyTermByName($wrapper, $field_name, $value);
+        $value = $this->setTaxonomyTermByName($field_name, $value);
         break;
       default:
         break;
@@ -67,7 +67,7 @@ class EntityHelperSet {
    * For taxonomy terms the default is to set by term id. This function takes
    * term names and returns the appropriate term ids.
    */
-  protected function setTaxonomyTermByName(EntityMetadataWrapper $wrapper, $field_name, $value) {
+  protected function setTaxonomyTermByName($field_name, $value) {
     $field_info = field_info_field($field_name);
     // This should never happen for term reference fields.
     if (empty($field_info['settings']['allowed_values'][0]['vocabulary'])) {
