@@ -23,7 +23,10 @@ class EntityHelperConfig {
    *
    * @param array $fields
    *   An associative array keyed by field machine names, values define how a
-   *   field value should be transformed before returning it. Possible values:
+   *   field value should be transformed. Both field getters and setters use
+   *   this configuration object.
+   *
+   *   Possible values when getting field values:
    *   - term_id: return taxonomy term ids instead of objects
    *   - term_name: return taxonomy term names instead of objects
    *   - term_link: return links to taxonomy term pages instead of objects
@@ -34,6 +37,10 @@ class EntityHelperConfig {
    *   - date: return a formatted date instead of a timestamp, need to specify
    *           a date format with EntityHelperConfig::addDateFormat()
    *           @see EntityHelperConfig::addDateFormat()
+   *
+   *   Possible values when settings field values:
+   *   - term_name: term names are expected, change them to term ids
+   *   - list_value: list values are expecte, change them to keys
    */
   public function __construct($fields) {
     foreach ($fields as $field_name => $return_type) {
