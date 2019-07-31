@@ -47,6 +47,21 @@ class EntityHelperSet {
     }
   }
 
+  /**
+   * Applies custom changes to field values.
+   *
+   * @param EntityMetadataWrapper $wrapper
+   * @param string $field_name
+   *   Field machine name.
+   * @param mixed $value
+   *   The field value to set.
+   * @param EntityHelperConfig $config
+   *   Configuration object.
+   *   @see EntityHelperConfig
+   *
+   * @return mixed
+   *   The updated field value.
+   */
   protected function applyConfigToValue(EntityMetadataWrapper $wrapper, $field_name, $value, EntityHelperConfig $config = NULL) {
     $conf = $config->getConfigForField($field_name);
     if (empty($conf) OR is_null($value)) {
