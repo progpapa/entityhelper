@@ -24,12 +24,13 @@ function entityhelper_menu() {
   //   - $entity_id
   //   - $field_name
   //   - $value
-  $items['entityhelper/update/%/%/%/%'] = array(
+  $items['entityhelper/update/%/%entity_object/%/%'] = array(
     'title' => 'Update Entity',
-    'page callback' => 'entityhelper_update_single_field_by_id',
-    'page arguments' => array(2, 3, 4, 5),
+    'page callback' => 'entityhelper_update_single_field',
+    'page arguments' => array(3, 4, 5),
     'access callback' => 'entityhelper_user_can_edit_field',
-    'access arguments' => array(2, 3, 4),
+    'access arguments' => array(3, 4),
+    'load arguments' => array(2),
     'type' => MENU_CALLBACK,
   );
   return $items;
@@ -45,13 +46,26 @@ function entityhelper_menu() {
  *
  * @return boolean
  */
-function entityhelper_user_can_edit_field($entity_type, $entity_id, $field_name, $account = NULL) {
+function entityhelper_user_can_edit_field_by_id($entity_type, $entity_id, $field_name, $account = NULL) {
   $entity = entity_object_load($entity_id, $entity_type);
-  if (!entity_access('update', $entity_type, $entity, $account)) {
+  return entityhelper_user_can_edit_field($entity, $field_name, $account);
+}
+
+/**
+ * Checks if a user can edit a field of an entity.
+ *
+ * @param object $entity
+ * @param string $field_name
+ * @param object $account
+ *
+ * @return boolean
+ */
+function entityhelper_user_can_edit_field($entity, $field_name, $account = NULL) {
+  if (!entity_access('update', $entity->base_type, $entity, $account)) {
     return FALSE;
   }
   $field_info = field_info_field($field_name);
-  if (!field_access('edit', $field_info, $entity_type, $entity, $account)) {
+  if (!field_access('edit', $field_info, $entity->base_type, $entity, $account)) {
     return FALSE;
   }
   return TRUE;
