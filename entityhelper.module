@@ -33,6 +33,11 @@ function entityhelper_menu() {
     'load arguments' => array(2),
     'type' => MENU_CALLBACK,
   );
+  // Updates fields of an entity
+  // See entityhelper_update_by_post() for the content of $_POST.
+  // arguments:
+  //   - $entity_type
+  //   - $entity_id
   $items['entityhelper/update-by-post/%/%entity_object'] = array(
     'title' => 'Update Entity',
     'page callback' => 'entityhelper_update_by_post',
@@ -167,8 +172,7 @@ function entityhelper_update_by_post($entity) {
   if (empty($data['fields'])) {
     return 0;
   }
-  entityhelper_update_field(
-      $entity, $data['fields']);
+  entityhelper_update_field($entity, $data['fields']);
   return 1;
 }
 
