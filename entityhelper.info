@@ -1,6 +1,6 @@
 name = Entity Helper
 description = Code snippets to help operations with entities and metadata wrappers.
-package = custom
+package = entityhelper
 core = 7.x
 
 dependencies[] = container
