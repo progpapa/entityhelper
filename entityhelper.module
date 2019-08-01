@@ -33,6 +33,15 @@ function entityhelper_menu() {
     'load arguments' => array(2),
     'type' => MENU_CALLBACK,
   );
+  $items['entityhelper/update-by-post/%/%entity_object'] = array(
+    'title' => 'Update Entity',
+    'page callback' => 'entityhelper_update_by_post',
+    'page arguments' => array(3),
+    'access callback' => 'entity_access',
+    'access arguments' => array('update', 2, 3),
+    'load arguments' => array(2),
+    'type' => MENU_CALLBACK,
+  );
   return $items;
 }
 
@@ -138,6 +147,29 @@ function entityhelper_get_wrapper_by_id($entity_type, $entity_id, $skip_cache = 
 function entityhelper_update_single_field_by_id($entity_type, $entity_id, $field_name, $value, $skip_save = FALSE, EntityHelperConfig $config = NULL) {
   entityhelper_update_field_by_id(
       $entity_type, $entity_id, array($field_name => $value), $skip_save, $config);
+}
+
+/**
+ * Updates an entity via POST request.
+ *
+ * Field data should be in the "fields" key of the POST array. Value is an
+ * associative array keyed by field machine names, values are field values.
+ *
+ * @todo: Allow $config array?
+ *
+ * @param object $entity
+ *
+ * @return int
+ *   Returns 1 if the update was successful, 0 otherwise.
+ */
+function entityhelper_update_by_post($entity) {
+  $data = filter_input_array(INPUT_POST);
+  if (empty($data['fields'])) {
+    return 0;
+  }
+  entityhelper_update_field(
+      $entity, $data['fields']);
+  return 1;
 }
 
 /**
