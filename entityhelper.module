@@ -170,10 +170,12 @@ function entityhelper_update_single_field_by_id($entity_type, $entity_id, $field
 function entityhelper_update_by_post($entity) {
   $data = filter_input_array(INPUT_POST);
   if (empty($data['fields'])) {
-    return 0;
+    // Not translated on purpose.
+    return drupal_json_output('empty');
   }
   entityhelper_update_field($entity, $data['fields']);
-  return 1;
+  // Not translated on purpose.
+  return drupal_json_output('success');
 }
 
 /**
