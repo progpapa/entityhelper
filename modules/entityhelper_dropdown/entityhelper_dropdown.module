@@ -1,0 +1,71 @@
+<?php
+
+/**
+ * @file
+ * Main file for the entityhelper_dropdown module.
+ */
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function entityhelper_dropdown_field_formatter_info() {
+  return array(
+    'entityhelper_dropdown' => array(
+      'label' => t('List as Dropdown'),
+      'field types' => array('list_integer', 'list_float', 'list_text', 'list_boolean'),
+      'settings' => array(
+        // Hard coded default formatter from list_field_info()
+        'fallback' => 'list_default',
+        // Displays an "Updated" message after the field is changed.
+        'callbacks' => 'entityhelper_dropdown.entityhelper_dropdown_updated',
+        'empty_fields_handler' => 'EntityhelperDropdownEmpty',
+      ),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_formatter_info_alter().
+ */
+function entityhelper_dropdown_field_formatter_info_alter(&$info) {
+  // This should be set here to override settings in
+  // empty_fields_field_formatter_info_alter().
+  $info['entityhelper_dropdown']['settings']['empty_fields_handler']
+      = 'EntityhelperDropdownEmpty';
+}
+
+/**
+ * Implements hook_field_formatter_settings_summary().
+ */
+function entityhelper_dropdown_field_formatter_settings_summary($field, $instance, $view_mode) {
+  return entityhelper_container()->EntityHelperDropdown
+      ->formatterSettingsSummary($field, $instance, $view_mode);
+}
+
+/**
+ * Implements hook_field_formatter_settings_form().
+ */
+function entityhelper_dropdown_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
+  return entityhelper_container()->EntityHelperDropdown
+      ->fieldFormatterSettingsForm($field, $instance, $view_mode, $form, $form_state);
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+function entityhelper_dropdown_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  return entityhelper_container()->EntityHelperDropdown->fieldFormatterView(
+      $entity_type, $entity, $field, $instance, $langcode, $items, $display);
+}
+
+/**
+ * Implements hook_empty_fields().
+ */
+function entityhelper_dropdown_empty_fields() {
+  $items = array(
+    'EntityhelperDropdownEmpty' => array(
+      'title' => t('Display dropdown for empty fields.'),
+    ),
+  );
+  return $items;
+}

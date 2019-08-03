@@ -1,0 +1,10 @@
+name = Entity Helper Dropdown
+description = Display list and boolean fields as dropdowns on entity view pages.
+package = entityhelper
+core = 7.x
+
+dependencies[] = empty_fields
+dependencies[] = entityhelper
+
+files[] = inc/EntityHelperDropdown.inc
+files[] = inc/EntityhelperDropdownEmpty.inc
