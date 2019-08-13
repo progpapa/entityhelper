@@ -3,15 +3,15 @@ description = Code snippets to help operations with entities and metadata wrappe
 package = entityhelper
 core = 7.x
 
-dependencies[] = container
+dependencies[] = ppcontainer
 dependencies[] = entity
 dependencies[] = entity_base_type
 
-files[] = inc/container/EntityHelperContainer.inc
-files[] = inc/EntityHelperConfig.inc
-files[] = inc/EntityHelperField.inc
-files[] = inc/EntityHelperChanged.inc
-files[] = inc/EntityHelperGet.inc
-files[] = inc/EntityHelperSet.inc
-files[] = inc/EntityHelperWrapper.inc
-files[] = inc/EntityHelperTaxonomy.inc
+files[] = inc/container/entityhelpercontainer.inc
+files[] = inc/entityhelperconfig.inc
+files[] = inc/entityhelperfield.inc
+files[] = inc/entityhelperchanged.inc
+files[] = inc/entityhelperget.inc
+files[] = inc/entityhelperset.inc
+files[] = inc/entityhelperwrapper.inc
+files[] = inc/entityhelpertaxonomy.inc

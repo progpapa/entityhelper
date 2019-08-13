@@ -10,4 +10,4 @@
  * @property EntityHelperTaxonomy $EntityHelperTaxonomy
  * @property EntityHelperDropdown $EntityHelperDropdown
  */
-class EntityHelperContainer extends AbstractContainer {}
+class EntityHelperContainer extends AbstractPPContainer {}

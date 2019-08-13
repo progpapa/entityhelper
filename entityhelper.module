@@ -10,7 +10,7 @@
  * @return EntityHelperContainer
  */
 function entityhelper_container() {
-  return container('EntityHelperContainer');
+  return ppcontainer('entityHelperContainer');
 }
 
 /**
@@ -311,4 +311,43 @@ function entityhelper_have_fields_changed($entity, $field_names) {
 function entityhelper_have_fields_changed_detailed($entity, $field_names) {
   return entityhelper_container()->EntityHelperChanged
       ->haveFieldsChangedDetailed($entity, $field_names);
+}
+
+/**
+ * Gets term ids by term names and vocabulary id.
+ *
+ * There seems to be no other way to access the term ids by their names but
+ * loading each term with taxonomy_term_load_by_name().
+ * If only the term ids are needed, this seems to be a better way.
+ *
+ * @param string|array $names
+ *   A term name or an array of term names.
+ * @param int $vid
+ *   A vocabulary id.
+ *
+ * @return string|array
+ *   A term id or an array of term ids.
+ */
+function entityhelper_get_tids_by_name_and_vocab_id($names, $vid) {
+  return entityhelper_container()->EntityHelperTaxonomy
+      ->getTermIDsByNameAndVid($names, $vid);
+}
+
+/**
+ * Gets term ids by term names and vocabulary name.
+ *
+ * @param string|array $names
+ *   A term name or an array of term names.
+ * @param string $vocab_name
+ *   A vocabulary machine name.
+ *
+ * @return string|array
+ *   A term id or an array of term ids.
+ *
+ * @throws Exception
+ *   An exception is thrown if there is no vocabulary with $vocab_name.
+ */
+function entityhelper_get_tids_by_name_and_vocab_name($names, $vocab_name) {
+  return entityhelper_container()->EntityHelperTaxonomy
+      ->getTermIDsByNameAndVocabName($names, $vocab_name);
 }

@@ -63,7 +63,7 @@ function entityhelper_dropdown_field_formatter_view($entity_type, $entity, $fiel
  */
 function entityhelper_dropdown_empty_fields() {
   $items = array(
-    'EntityhelperDropdownEmpty' => array(
+    'EntityHelperDropdownEmpty' => array(
       'title' => t('Display dropdown for empty fields.'),
     ),
   );
