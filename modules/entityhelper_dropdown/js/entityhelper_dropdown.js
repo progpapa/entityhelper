@@ -65,13 +65,20 @@
        */
       function entityhelper_dropdown_cardinality_failed(element) {
         var cardinality = element.data('cardinality');
+        var required = element.data('required');
         var value = element.val();
         var latest_values = element.data('last-selection');
         var length = Array.isArray(value) ? value.length : 1;
         if (cardinality !== -1 && length > cardinality) {
-          element.once().before('<h4 class="fdropdown-warning">'
+          element.once('toomany').before('<h4 class="fdropdown-warning">'
             + Drupal.t('You can select at most @cardinality options.'
             , {'@cardinality':cardinality})+'</h4>');
+          element.val(latest_values);
+          return true;
+        }
+        if (required && value == null) {
+          element.once('empty').before('<h4 class="fdropdown-warning">'
+            + Drupal.t('This is a reqired field.') +'</h4>');
           element.val(latest_values);
           return true;
         }

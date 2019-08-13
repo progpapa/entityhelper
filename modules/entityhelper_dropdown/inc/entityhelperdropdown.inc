@@ -112,8 +112,7 @@ class EntityHelperDropdown {
       '#value' => $values,
       '#attributes' => array(
         'class' => array('entityhelper-dropdown'),
-        // @todo: implement this?
-        // 'data-required' => ...
+         'data-required' => $instance['required'],
         // @todo: adding all these could go into a helper funcion for fields
         'data-entityid' => entityhelper_get_id($entity),
         'data-entitytype' => $entity_type,
