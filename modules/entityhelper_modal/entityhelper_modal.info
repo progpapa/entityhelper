@@ -1,0 +1,9 @@
+name = Entity Helper Modal
+description = Display fields as links to field edit modal forms.
+package = entityhelper
+core = 7.x
+
+files[] = inc/entityhelpermodal.inc
+
+dependencies[] = entityhelper
+dependencies[] = ctools

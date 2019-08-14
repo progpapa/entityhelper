@@ -1,0 +1,57 @@
+<?php
+/**
+ * @file
+ * Main file for the entityhelper_modal module.
+ */
+
+/**
+ * Implements hook_field_formatter_info_alter().
+ */
+function entityhelper_modal_field_formatter_info_alter(&$info) {
+  foreach ($info as $name => $formatter) {
+    $info[$name]['settings']['entityhelper_modal']['enabled'] = FALSE;
+    $info[$name]['settings']['entityhelper_modal']['link_text'] = t('edit');
+    $info[$name]['settings']['entityhelper_modal']['display'] = 'block';
+    $info[$name]['settings']['entityhelper_modal']['wrapper_classes'] = '';
+  }
+}
+
+/**
+ * Implements hook_field_formatter_settings_form_alter().
+ */
+function entityhelper_modal_field_formatter_settings_form_alter(array &$settings_form, array $context) {
+  entityhelper_container()->EntityHelperModal
+      ->settingsFormAlter($settings_form, $context);
+}
+
+/**
+ * Implements hook_field_formatter_settings_summary_alter().
+ */
+function entityhelper_modal_field_formatter_settings_summary_alter(&$summary, $context) {
+  entityhelper_container()->EntityHelperModal
+      ->settingsSummaryAlter($summary, $context);
+}
+
+/**
+ * Implements hook_field_attach_view_alter().
+ */
+function entityhelper_modal_field_attach_view_alter(&$output, $context) {
+  entityhelper_container()->EntityHelperModal
+      ->fieldAttachViewAlter($output, $context);
+}
+
+/**
+ * Post render callback: appends a link to a ctools modal edit form to a field.
+ *
+ * @param string $html
+ *   The rendered output of the field;
+ * @param array $render
+ *   The field render array.
+ *
+ * @return string
+ *   The updated HTML output of the field.
+ */
+function entityhelper_modal_post_render_add_link($html, $render) {
+  return entityhelper_container()->EntityHelperModal
+      ->postRenderAddLink($html, $render);
+}
