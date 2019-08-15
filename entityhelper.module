@@ -10,7 +10,7 @@
  * @return EntityHelperContainer
  */
 function entityhelper_container() {
-  return ppcontainer('entityHelperContainer');
+  return ppcontainer('EntityHelperContainer');
 }
 
 /**
