@@ -5,6 +5,29 @@
  */
 
 /**
+ * Implements hook_menu().
+ */
+function entityhelper_modal_menu() {
+  $items = array();
+  // Path to the field edit modal form. Arguments:
+  // - entity type
+  // - entity id
+  // - field machine name
+  $items['entityhelper_modal/edit/%/%entity_object/%/%ctools_js'] = array(
+    'title' => 'EntityHelper Modal',
+    'description' => 'Display field edit forms in a modal.',
+    'load arguments' => array(2),
+    'page callback' => 'entityhelper_modal_modal',
+    'page arguments' => array(3, 4, 5),
+    'access callback' => 'entityhelper_user_can_edit_field',
+    'access arguments' => array(3, 4),
+    'type' => MENU_CALLBACK,
+    'file' => 'entityhelper_modal.inc',
+  );
+  return $items;
+}
+
+/**
  * Implements hook_field_formatter_info_alter().
  */
 function entityhelper_modal_field_formatter_info_alter(&$info) {
