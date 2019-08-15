@@ -7,3 +7,4 @@ files[] = inc/entityhelpermodal.inc
 
 dependencies[] = entityhelper
 dependencies[] = ctools
+dependencies[] = field_formatter_settings

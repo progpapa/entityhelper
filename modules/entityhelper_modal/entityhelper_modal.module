@@ -11,7 +11,8 @@ function entityhelper_modal_field_formatter_info_alter(&$info) {
   foreach ($info as $name => $formatter) {
     $info[$name]['settings']['entityhelper_modal']['enabled'] = FALSE;
     $info[$name]['settings']['entityhelper_modal']['link_text'] = t('edit');
-    $info[$name]['settings']['entityhelper_modal']['display'] = 'block';
+    $info[$name]['settings']['entityhelper_modal']['style'] = '';
+    $info[$name]['settings']['entityhelper_modal']['link_classes'] = '';
     $info[$name]['settings']['entityhelper_modal']['wrapper_classes'] = '';
   }
 }
