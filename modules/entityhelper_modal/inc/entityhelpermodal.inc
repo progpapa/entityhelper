@@ -106,6 +106,10 @@ class EntityHelperModal {
     ctools_modal_add_js();
 
     $settings = $this->getSettings($render);
+    // Implement hook_entityhelper_modal_add_style() to add custom modal styles.
+    if (!empty($settings['style'])) {
+      module_invoke_all('entityhelper_modal_add_style', $settings['style']);
+    }
 
     $link = ctools_modal_text_button($settings['link_text'], $settings['url']
         , '', implode(' ', $settings['link_classes']));
@@ -185,6 +189,9 @@ class EntityHelperModal {
       foreach ($custom_link_classes as $class_name) {
         $link_classes[] = drupal_html_class($class_name);
       }
+    }
+    if (!empty($settings['style'])) {
+      $link_classes[] = 'ctools-modal-' . $settings['style'];
     }
     $settings['link_classes'] = $link_classes;
 
