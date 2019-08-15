@@ -84,8 +84,19 @@ class EntityHelperModal {
    * Implements hook_field_attach_view_alter().
    */
   public function fieldAttachViewAlter(&$output, $context) {
-    $view_mode = $context['view_mode'];
-    foreach (field_info_instances($output['#entity_type'], $output['#bundle'])
+    $view_mode = is_array($context['display']) ? 'default' : $context['display'];
+    // Field is being rendered via field_view_field(). $output has a different
+    // structure in this case.
+    if ($context['view_mode'] === '_custom') {
+      $entity = reset($output)['#object'];
+      $entity_type = $entity->base_type;
+      list($id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
+    }
+    else {
+      $entity_type = $output['#entity_type'];
+      $bundle = $output['#bundle'];
+    }
+    foreach (field_info_instances($entity_type, $bundle)
     as $field_name => $instance) {
       $display = field_get_display($instance, $view_mode, $context['entity']);
       if (empty($output[$field_name])) {
