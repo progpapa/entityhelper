@@ -134,7 +134,7 @@ class EntityHelperModal {
       'class' => $settings['wrapper_classes'],
       'data-entity-type' => $settings['entity_type'],
       'data-entity-id' => $settings['entity_id'],
-      'data-field-name' => $settings['field-name'],
+      'data-field-name' => $settings['field_name'],
     );
     return '<div ' . drupal_attributes($attributes) . '>'
         . $html . $link . '</div>';
