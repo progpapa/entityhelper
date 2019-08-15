@@ -248,6 +248,30 @@ function entityhelper_get_id($entity) {
   return entity_id($entity->base_type, $entity);
 }
 
+/**
+ * Wrapper function to save an entity.
+ *
+ * @param object $entity
+ */
+function entityhelper_save($entity) {
+  // In order to have the base_type property, the entity_base_type module needs
+  // to be enabled.
+  if (empty($entity->base_type)) {
+    return NULL;
+  }
+  try {
+    entity_save($entity->base_type, $entity);
+  } catch (Exception $e) {
+    $message = t('Failed to save entity of type @type, id @id' , array(
+      '@type' => $entity->base_type,
+      '@id' => entityhelper_get_id($entity)
+    ));
+    watchdog('entityhelper', $message);
+    watchdog_exception('entityhelper', $e);
+    drupal_set_message($message, 'error');
+  }
+}
+
   /**
    * Gets one or more field values of an entity.
    *
