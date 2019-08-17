@@ -99,6 +99,6 @@ class EntityHelperModal {
     $selector = 'div[data-entityid="' . entityhelper_get_id($entity)
         . '"][data-entitytype="' . $entity->base_type . '"][data-fieldname="'
         . $field_name . '"]';
-    $output[] = ajax_command_html($selector, drupal_render($value));
+    $output[] = ajax_command_replace($selector, drupal_render($value));
   }
 }
