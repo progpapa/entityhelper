@@ -29,6 +29,9 @@ class EntityHelperModal {
       print ajax_render($output);
       drupal_exit();
     }
+    else {
+      return drupal_get_form('entityhelper_modal_form', $entity, $field_name);
+    }
   }
 
   /**
@@ -78,13 +81,14 @@ class EntityHelperModal {
    * @see entityhelper_modal_form_submit()
    */
   public function submit($form, &$form_state) {
-    entityhelper_save($form_state['storage']['entity']);
-  //  if (function_exists('ctools_modal_command_dismiss')) {
-  //    $form_state['ajax_commands'][] = ctools_modal_command_dismiss();
-  //  }
-  //  else {
-      // do something?
-  //  }
+    $entity = $form_state['storage']['entity'];
+    if ($form_state['triggering_element']['#value'] === t('Submit')) {
+      entityhelper_save($entity);
+    }
+    // @todo: JS is disabled, try to find out a good place to redirect after submission.
+    if (!function_exists('ctools_modal_command_dismiss')) {
+      drupal_goto($entity->base_type . '/' . entityhelper_get_id($entity));
+    }
   }
 
   /**

@@ -15,7 +15,7 @@
  * @todo: make this multilingual, language code should be passed from hook_menu
  */
 function entityhelper_modal_modal_build($entity, $field_name, $js) {
-  entityhelper_container()->EntityHelperModal->build($entity, $field_name, $js);
+  return entityhelper_container()->EntityHelperModal->build($entity, $field_name, $js);
 }
 
 /**
