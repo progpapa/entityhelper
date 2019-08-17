@@ -88,7 +88,7 @@ class EntityHelperModalSettings {
     // Field is being rendered via field_view_field(). $output has a different
     // structure in this case.
     if ($context['view_mode'] === '_custom') {
-      $entity = reset($output)['#object'];
+      $entity = $context['entity'];
       $entity_type = $entity->base_type;
       list($id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
     }
