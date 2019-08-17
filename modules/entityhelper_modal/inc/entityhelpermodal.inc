@@ -95,6 +95,7 @@ class EntityHelperModal {
    * Adds ajax command to update the appropriate field in the parent page.
    */
   protected function setReplace(&$output, $entity, $field_name) {
+    // @todo: fix hard coded 'default' view mode...
     $value = field_view_field($entity->base_type, $entity, $field_name, 'default');
     $selector = 'div[data-entityid="' . entityhelper_get_id($entity)
         . '"][data-entitytype="' . $entity->base_type . '"][data-fieldname="'

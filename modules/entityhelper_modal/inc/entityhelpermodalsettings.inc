@@ -84,18 +84,15 @@ class EntityHelperModalSettings {
    * Implements hook_field_attach_view_alter().
    */
   public function fieldAttachViewAlter(&$output, $context) {
-    $view_mode = is_array($context['display']) ? 'default' : $context['display'];
-    // Field is being rendered via field_view_field(). $output has a different
-    // structure in this case.
-    if ($context['view_mode'] === '_custom') {
-      $entity = $context['entity'];
-      $entity_type = $entity->base_type;
-      list($id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
+    if (empty($context['view_mode']) || empty($context['display'])) {
+      return;
     }
-    else {
-      $entity_type = $output['#entity_type'];
-      $bundle = $output['#bundle'];
-    }
+
+    $entity_type = $context['entity_type'];
+    $entity = $context['entity'];
+    $view_mode = $context['view_mode'];
+    list($id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
+
     foreach (field_info_instances($entity_type, $bundle)
     as $field_name => $instance) {
       $display = field_get_display($instance, $view_mode, $context['entity']);
@@ -104,6 +101,8 @@ class EntityHelperModalSettings {
       }
       if (!empty($display['settings']['entityhelper_modal']['enabled'])) {
         $output[$field_name]['#post_render'] = array('entityhelper_modal_post_render_add_link');
+        $output[$field_name]['#entityhelper_modal']
+            = $display['settings']['entityhelper_modal'];
       }
     }
   }
