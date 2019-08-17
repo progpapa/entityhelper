@@ -15,9 +15,8 @@ class EntityHelperModalSettings {
       '#type' => 'fieldset',
       '#title' => t('Modal Edit'),
       '#description' => t('Display a link that opens field edit in a modal.'),
-      '#weight' => -10,
       '#collapsible' => TRUE,
-      '#collapsed' => FALSE,
+      '#collapsed' => TRUE,
       '#weight' => 10,
     );
     $settings_form['entityhelper_modal']['enabled'] = array(

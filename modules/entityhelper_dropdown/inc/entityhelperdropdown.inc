@@ -44,7 +44,7 @@ class EntityHelperDropdown {
       '#options' => $this->getFormatterOptions($field['type'], 'entityhelper_dropdown'),
       '#default_value' => $settings['fallback'],
       '#required' => TRUE,
-      '#weight' => 0
+      '#weight' => -100
     );
 
     $element['callbacks'] = array(
@@ -55,7 +55,7 @@ class EntityHelperDropdown {
       '#rows' => 10,
       '#columns' => 40,
       '#required' => FALSE,
-      '#weight' => 20,
+      '#weight' => -99,
     );
 
     return $element;
