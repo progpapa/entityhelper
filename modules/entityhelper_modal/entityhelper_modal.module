@@ -17,7 +17,7 @@ function entityhelper_modal_menu() {
     'title' => 'EntityHelper Modal',
     'description' => 'Display field edit forms in a modal.',
     'load arguments' => array(2),
-    'page callback' => 'entityhelper_modal_modal',
+    'page callback' => 'entityhelper_modal_modal_build',
     'page arguments' => array(3, 4, 5),
     'access callback' => 'entityhelper_user_can_edit_field',
     'access arguments' => array(3, 4),
@@ -44,7 +44,7 @@ function entityhelper_modal_field_formatter_info_alter(&$info) {
  * Implements hook_field_formatter_settings_form_alter().
  */
 function entityhelper_modal_field_formatter_settings_form_alter(array &$settings_form, array $context) {
-  entityhelper_container()->EntityHelperModal
+  entityhelper_container()->EntityHelperModalSettings
       ->settingsFormAlter($settings_form, $context);
 }
 
@@ -52,7 +52,7 @@ function entityhelper_modal_field_formatter_settings_form_alter(array &$settings
  * Implements hook_field_formatter_settings_summary_alter().
  */
 function entityhelper_modal_field_formatter_settings_summary_alter(&$summary, $context) {
-  entityhelper_container()->EntityHelperModal
+  entityhelper_container()->EntityHelperModalSettings
       ->settingsSummaryAlter($summary, $context);
 }
 
@@ -60,7 +60,7 @@ function entityhelper_modal_field_formatter_settings_summary_alter(&$summary, $c
  * Implements hook_field_attach_view_alter().
  */
 function entityhelper_modal_field_attach_view_alter(&$output, $context) {
-  entityhelper_container()->EntityHelperModal
+  entityhelper_container()->EntityHelperModalSettings
       ->fieldAttachViewAlter($output, $context);
 }
 
@@ -76,6 +76,6 @@ function entityhelper_modal_field_attach_view_alter(&$output, $context) {
  *   The updated HTML output of the field.
  */
 function entityhelper_modal_post_render_add_link($html, $render) {
-  return entityhelper_container()->EntityHelperModal
+  return entityhelper_container()->EntityHelperModalSettings
       ->postRenderAddLink($html, $render);
 }

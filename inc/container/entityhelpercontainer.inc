@@ -10,5 +10,6 @@
  * @property EntityHelperTaxonomy $EntityHelperTaxonomy
  * @property EntityHelperDropdown $EntityHelperDropdown
  * @property EntityHelperModal $EntityHelperModal
+ * @property EntityHelperModalSettings $EntityHelperModalSettings
  */
 class EntityHelperContainer extends AbstractPPContainer {}

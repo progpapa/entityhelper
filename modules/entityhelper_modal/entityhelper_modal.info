@@ -4,6 +4,7 @@ package = entityhelper
 core = 7.x
 
 files[] = inc/entityhelpermodal.inc
+files[] = inc/entityhelpermodalsettings.inc
 
 dependencies[] = entityhelper
 dependencies[] = ctools

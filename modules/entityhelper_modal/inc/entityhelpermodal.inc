@@ -2,215 +2,99 @@
 
 /**
  * @file
- * Code for the entityhelper_dropdown field formatter.
+ * Builds a modal to edit fields.
  */
 class EntityHelperModal {
 
   /**
-   * Implements hook_field_formatter_settings_form_alter().
+   * @see entityhelper_modal_modal_build()
    */
-  public function settingsFormAlter(array &$settings_form, array $context) {
-    $settings = $context['instance']['display'][$context['view_mode']]['settings'];
-    $settings_form['entityhelper_modal'] = array(
-      '#type' => 'fieldset',
-      '#title' => t('Modal Edit'),
-      '#description' => t('Display a link that opens field edit in a modal.'),
-      '#weight' => -10,
-      '#collapsible' => TRUE,
-      '#collapsed' => FALSE,
-      '#weight' => 10,
-    );
-    $settings_form['entityhelper_modal']['enabled'] = array(
-      '#type' => 'checkbox',
-      '#title' => t('Enable modal edit'),
-      '#default_value' => $settings['entityhelper_modal']['enabled'],
-      '#weight' => 1,
-    );
-    $settings_form['entityhelper_modal']['link_text'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Link text'),
-      '#description' => t('The default text is: edit'),
-      '#default_value' => $settings['entityhelper_modal']['link_text'],
-      '#size' => 40,
-      '#maxlength' => 100,
-      '#weight' => 2,
-    );
-    $settings_form['entityhelper_modal']['style'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Modal style'),
-      '#description' => t('Apply custom style to the modal.'),
-      '#default_value' => $settings['entityhelper_modal']['style'],
-      '#size' => 40,
-      '#maxlength' => 100,
-      '#weight' => 3,
-    );
-    $settings_form['entityhelper_modal']['link_classes'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Custom link class names'),
-      '#description' => t('Will be added to the edit link. Separate with spaces.'),
-      '#default_value' => $settings['entityhelper_modal']['link_classes'],
-      '#size' => 40,
-      '#maxlength' => 100,
-      '#weight' => 4,
-    );
-    $settings_form['entityhelper_modal']['wrapper_classes'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Custom wrapper class names'),
-      '#description' => t('Will be added to the wrapper. Separate with spaces.'),
-      '#default_value' => $settings['entityhelper_modal']['wrapper_classes'],
-      '#size' => 40,
-      '#maxlength' => 100,
-      '#weight' => 4,
-    );
-  }
+  public function build($entity, $field_name, $js) {
+    if ($js) {
+      ctools_include('ajax');
+      ctools_include('modal');
 
-  /**
-   * Implements hook_field_formatter_settings_summary_alter().
-   */
-  public function settingsSummaryAlter(&$summary, $context) {
-    $settings = $context['instance']['display'][$context['view_mode']]['settings'];
-    $style = empty($settings['entityhelper_modal']['style'])
-        ? t('default') : $settings['entityhelper_modal']['style'];
-    if (!empty($settings['entityhelper_modal']['enabled'])) {
-      $summary .= '<br />'
-        . t('Modal edit enabled, link text: @link_text, style: @style', array(
-          '@link_text' => $settings['entityhelper_modal']['link_text'],
-          '@style' => $style,
-        ));
-    }
-  }
+      $form_state = array('ajax' => TRUE);
+      $form_state['build_info']['args'] = array($entity, $field_name);
+  //    $form_state['storage']['entity'] = $entity;
+  //    $form_state['storage']['field_name'] = $field_name;
 
-  /**
-   * Implements hook_field_attach_view_alter().
-   */
-  public function fieldAttachViewAlter(&$output, $context) {
-    $view_mode = is_array($context['display']) ? 'default' : $context['display'];
-    // Field is being rendered via field_view_field(). $output has a different
-    // structure in this case.
-    if ($context['view_mode'] === '_custom') {
-      $entity = reset($output)['#object'];
-      $entity_type = $entity->base_type;
-      list($id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
-    }
-    else {
-      $entity_type = $output['#entity_type'];
-      $bundle = $output['#bundle'];
-    }
-    foreach (field_info_instances($entity_type, $bundle)
-    as $field_name => $instance) {
-      $display = field_get_display($instance, $view_mode, $context['entity']);
-      if (empty($output[$field_name])) {
-        continue;
+      $output = ctools_modal_form_wrapper('entityhelper_modal_form', $form_state);
+      if (!empty($form_state['executed'])) {
+        $output = array();
+        // Adds ajax commands to update content on the parent page.
+        $this->setReplace($output, $entity, $field_name);
+        $output[] = ctools_modal_command_dismiss();
       }
-      if (!empty($display['settings']['entityhelper_modal']['enabled'])) {
-        $output[$field_name]['#post_render'] = array('entityhelper_modal_post_render_add_link');
-      }
+      print ajax_render($output);
+      drupal_exit();
     }
   }
 
   /**
-   * @see entityhelper_modal_post_render_add_link()
+   * @see entityhelper_modal_form()
    */
-  public function postRenderAddLink($html, $render) {
-    ctools_include('ajax');
-    ctools_include('modal');
-    ctools_modal_add_js();
+  public function form($form, &$form_state, $entity, $field_name) {
+    $entity_type = $entity->base_type;
+    $langcode = LANGUAGE_NONE;
 
-    $settings = $this->getSettings($render);
-    // Implement hook_entityhelper_modal_add_style() to add custom modal styles.
-    if (!empty($settings['style'])) {
-      module_invoke_all('entityhelper_modal_add_style', $settings['style']);
-    }
+    $form_state['storage']['entity'] = $entity;
+    $form_state['storage']['field_name'] = $field_name;
 
-    $link = ctools_modal_text_button($settings['link_text'], $settings['url']
-        , '', implode(' ', $settings['link_classes']));
-
-    return $this->buildFieldHTML($html, $link, $settings);
-  }
-
-  /**
-   * Builds the HTML output of the field.
-   *
-   * Adds custom attributes like class names and data attributes to the wrapper
-   * and appends a modal edit link.
-   *
-   * @param string $html
-   *   The original HTML output of the field.
-   * @param string $link
-   *   A modal link.
-   * @param array $settings
-   *   Configuration settings.
-   *
-   * @return string
-   *   The update HTML output of the field.
-   */
-  protected function buildFieldHTML($html, $link, $settings) {
-    $attributes = array(
-      'class' => $settings['wrapper_classes'],
-      'data-entity-type' => $settings['entity_type'],
-      'data-entity-id' => $settings['entity_id'],
-      'data-field-name' => $settings['field_name'],
+    // Adds the form elements for only the specified field to the form.
+    $options = array(
+      'field_name' => $field_name,
+      'language' => field_valid_language($langcode),
+      'default' => TRUE,
     );
-    return '<div ' . drupal_attributes($attributes) . '>'
-        . $html . $link . '</div>';
+    field_attach_form($entity_type, $entity, $form, $form_state, $langcode, $options);
+    $form['submit'] = array(
+      '#type' => 'submit',
+      '#value' => t('Submit'),
+      '#weight' => 9000,
+    );
+    $form['cancel'] = array(
+      '#type' => 'button',
+      '#value' => t('Cancel'),
+      '#name' => 'cancel',
+      '#executes_submit_callback' => TRUE,
+      '#limit_validation_errors' => array(),
+      '#attributes' => array('class' => array('ctools-close-modal')),
+      '#weight' => 10000,
+    );
+    return $form;
   }
 
   /**
-   * Gets all configuration settings for the modal link.
-   *
-   * @param array $render
-   *   Field render array from the post_render function.
-   *
-   * @return array
-   *   An associative array with the following elements:
-   *   - enabled: 0/1 whether modal link is enabled for the field or not
-   *   - link_text: anchor text for the modal link, if empty t('edit') is used
-   *   - link_classes: array, additional classes to apply to the link
-   *   - wrapper_classes: array, classes apply to the entire field
-   *   - entity_type: the machine name of the entity type the field belongs to
-   *   - entity_id: well, the entity id
-   *   - field_name: machine name of the field
-   *   - url: the url of the modal that will be opened when clicking on the link
+   * @see entityhelper_modal_form_validate()
    */
-  protected function getSettings($render) {
-    $entity_type = $render['#entity_type'];
-    $field_name = $render['#field_name'];
-    $entity_id = entity_id($entity_type, $render['#object']);
-    $instances = field_info_instances($entity_type, $render['#bundle']);
-    $instance = $instances[$field_name];
-    $display = field_get_display($instance, $render['#view_mode']
-        , $render['#object']);
+  public function validate($form, &$form_state) {
+    $entity = $form_state['storage']['entity'];
+    $field_name = $form_state['storage']['field_name'];
+    field_attach_form_validate($entity->base_type, $entity, $form, $form_state, array('field_name' =>  $field_name));
+  }
 
-    $settings = $display['settings']['entityhelper_modal'];
-    if (empty($settings['link_text'])) {
-      $settings['link_text'] = t('edit');
-    }
+  /**
+   * @see entityhelper_modal_form_submit()
+   */
+  public function submit($form, &$form_state) {
+    entityhelper_save($form_state['storage']['entity']);
+  //  if (function_exists('ctools_modal_command_dismiss')) {
+  //    $form_state['ajax_commands'][] = ctools_modal_command_dismiss();
+  //  }
+  //  else {
+      // do something?
+  //  }
+  }
 
-    $wrapper_classes = array('entityhelper-modal-wrapper');
-    if (!empty($settings['wrapper_classes'])) {
-      $custom_wrapper_classes = explode(' ', $settings['wrapper_classes']);
-      foreach ($custom_wrapper_classes as $class_name) {
-        $wrapper_classes[] = drupal_html_class($class_name);
-      }
-    }
-    $settings['wrapper_classes'] = $wrapper_classes;
-    $link_classes = array('entityhelper-modal-link');
-    if (!empty($settings['link_classes'])) {
-      $custom_link_classes = explode(' ', $settings['link_classes']);
-      foreach ($custom_link_classes as $class_name) {
-        $link_classes[] = drupal_html_class($class_name);
-      }
-    }
-    if (!empty($settings['style'])) {
-      $link_classes[] = 'ctools-modal-' . $settings['style'];
-    }
-    $settings['link_classes'] = $link_classes;
-
-    $settings['entity_type'] = $entity_type;
-    $settings['field_name'] = $field_name;
-    $settings['entity_id'] = $entity_id;
-    $settings['url'] = 'entityhelper_modal/edit/' . $entity_type . '/'
-        . $entity_id . '/' . $field_name . '/nojs';
-    return $settings;
+  /**
+   * Adds ajax command to update the appropriate field in the parent page.
+   */
+  protected function setReplace(&$output, $entity, $field_name) {
+    $value = field_view_field($entity->base_type, $entity, $field_name, 'default');
+    $selector = 'div[data-entityid="' . entityhelper_get_id($entity)
+        . '"][data-entitytype="' . $entity->base_type . '"][data-fieldname="'
+        . $field_name . '"]';
+    $output[] = ajax_command_html($selector, drupal_render($value));
   }
 }
