@@ -1,0 +1,3 @@
+- find a way to know which mode to use in EntityHelperModal::setReplace()
+- allow to use radios/checkboxes in EntityHelperDropdown
+- add setting to force a page refresh for EntityHelperModal
